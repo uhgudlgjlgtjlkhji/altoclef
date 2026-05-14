@@ -32,8 +32,6 @@ import java.util.function.Function;
  * - MiningResourceRegistry: Ores, blocks, mobs, crops, plants
  * - CraftingMaterialRegistry: Smelting, block crafting, materials
  * - WoodResourceRegistry: Wood-type items and furniture
- * - ToolArmorRegistry: Tools, armor, weapons
- * - FurnitureRegistry: Furniture, redstone, complex items
  * 
  * Call `TaskCatalogue.getItemTask` to return a task given a resource key.
  * Call `TaskCatalogue.getSquashedItemTask` to return a task that gets multiple resources.
@@ -309,10 +307,239 @@ public class TaskCatalogue {
     }
 
     // ========================================================================
-    // Resource Registration Methods (Delegated to Registries)
+    // Resource Registration Helper Methods
     // ========================================================================
 
-    // Note: The actual registration methods (mine, simple, smelt, tools, etc.) 
-    // are implemented in TaskCatalogue and called by the registries above.
-    // This maintains backward compatibility while improving internal structure.
+    /**
+     * Registers a simple resource that can be collected directly.
+     */
+    public static CataloguedResource simple(String name, Item item, Function<Integer, ? extends CataloguedResourceTask> taskFactory) {
+        return simple(name, new Item[]{item}, taskFactory);
+    }
+
+    /**
+     * Registers a simple resource with multiple matching items.
+     */
+    @SafeVarargs
+    public static final CataloguedResource simple(String name, Item[] items, Function<Integer, ? extends CataloguedResourceTask> taskFactory) {
+        CataloguedResource resource = new CataloguedResource(name, items, taskFactory);
+        registerResource(resource);
+        return resource;
+    }
+
+    /**
+     * Registers a mining resource.
+     */
+    public static CataloguedResource mine(String name, MiningRequirement requirement, Block block, Item item) {
+        return mine(name, requirement, new Block[]{block}, item);
+    }
+
+    /**
+     * Registers a mining resource with multiple blocks.
+     */
+    public static CataloguedResource mine(String name, MiningRequirement requirement, Block[] blocks, Item... items) {
+        CataloguedResource resource = new CataloguedResource(name, items, 
+            count -> new MineAndCollectTask(null, count, blocks, requirement));
+        registerResource(resource);
+        return resource;
+    }
+
+    /**
+     * Registers a mob drop resource.
+     */
+    @SafeVarargs
+    public static final <T extends net.minecraft.entity.Entity> CataloguedResource mob(String name, Item item, Class<T> mobClass) {
+        CataloguedResource resource = new CataloguedResource(name, new Item[]{item}, 
+            count -> new MobDropTask(item, count, mobClass));
+        registerResource(resource);
+        return resource;
+    }
+
+    /**
+     * Registers a smelting resource.
+     */
+    public static CataloguedResource smelt(String name, Item item, String inputResource, Item... inputItems) {
+        CataloguedResource resource = new CataloguedResource(name, new Item[]{item}, 
+            count -> new SmeltInFurnaceTask(item, count, inputResource, inputItems));
+        registerResource(resource);
+        return resource;
+    }
+
+    /**
+     * Registers a tools resource.
+     */
+    public static void tools(String tier, String inputResource, Item... tools) {
+        for (Item tool : tools) {
+            simple(tool.getName().getString().replace(" ", "_").toLowerCase(), new Item[]{tool}, 
+                count -> new CraftInTableTask(tool, count, inputResource));
+        }
+    }
+
+    /**
+     * Registers an armor resource.
+     */
+    public static void armor(String tier, String inputResource, Item... armor) {
+        for (Item piece : armor) {
+            simple(piece.getName().getString().replace(" ", "_").toLowerCase(), new Item[]{piece}, 
+                count -> new CraftInTableTask(piece, count, inputResource));
+        }
+    }
+
+    /**
+     * Registers a smithing upgrade resource.
+     */
+    public static void smith(String name, Item item, String material, String baseItem) {
+        CataloguedResource resource = new CataloguedResource(name, new Item[]{item}, 
+            count -> new UpgradeInSmithingTableTask(item, count, material, baseItem));
+        registerResource(resource);
+    }
+
+    /**
+     * Registers a shaped recipe 3x3.
+     */
+    public static void shapedRecipe3x3(String name, Item item, int count, String... pattern) {
+        simple(name, new Item[]{item}, c -> new CraftInTableTask(item, c, pattern));
+    }
+
+    /**
+     * Registers a shaped recipe 2x2.
+     */
+    public static void shapedRecipe2x2(String name, Item item, int count, String... pattern) {
+        simple(name, new Item[]{item}, c -> new CraftInTableTask(item, c, pattern));
+    }
+
+    /**
+     * Registers a 3x3 block recipe.
+     */
+    public static void shapedRecipe3x3Block(String name, Item item, String input) {
+        shapedRecipe3x3(name, item, 1, input, input, input, input, input, input, input, input, input);
+    }
+
+    /**
+     * Registers a 2x2 block recipe.
+     */
+    public static void shapedRecipe2x2Block(String name, Item item, String input) {
+        shapedRecipe2x2(name, item, 1, input, input, input, input);
+    }
+
+    /**
+     * Registers a 2x2 block recipe with count.
+     */
+    public static void shapedRecipe2x2Block(String name, Item item, int count, String input) {
+        shapedRecipe2x2(name, item, count, input, input, input, input);
+    }
+
+    /**
+     * Registers a slab recipe.
+     */
+    public static void shapedRecipeSlab(String name, Item item, String input) {
+        shapedRecipe3x3(name, item, 6, input, input, input, input, input, input, o, o, o);
+    }
+
+    /**
+     * Registers a stairs recipe.
+     */
+    public static void shapedRecipeStairs(String name, Item item, String input) {
+        shapedRecipe3x3(name, item, 4, input, o, o, input, input, o, input, input, input);
+    }
+
+    /**
+     * Registers a wall recipe.
+     */
+    public static void shapedRecipeWall(String name, Item item, String input) {
+        shapedRecipe3x3(name, item, 6, input, input, input, input, input, input, o, o, o);
+    }
+
+    /**
+     * Registers a wood task.
+     */
+    public static CataloguedResource[] woodTasks(String name, Function<WoodType, Item> itemProvider, BiFunction<WoodType, Integer, ? extends CataloguedResourceTask> taskFactory, boolean registerAll) {
+        List<CataloguedResource> resources = new ArrayList<>();
+        for (WoodType wood : WoodType.values()) {
+            if (!registerAll && wood.isNetherWood()) continue;
+            Item item = itemProvider.apply(wood);
+            if (item == null) continue;
+            String resourceName = name;
+            if (registerAll) {
+                resourceName = name;
+            } else {
+                resourceName = name;
+            }
+            CataloguedResource resource = new CataloguedResource(resourceName, new Item[]{item}, 
+                count -> taskFactory.apply(wood, count));
+            registerResource(resource);
+            resources.add(resource);
+        }
+        return resources.toArray(new CataloguedResource[0]);
+    }
+
+    /**
+     * Registers a colorful task.
+     */
+    public static CataloguedResource[] colorfulTasks(String name, Function<DyeColor, Item> itemProvider, BiFunction<DyeColor, Integer, ? extends CataloguedResourceTask> taskFactory) {
+        List<CataloguedResource> resources = new ArrayList<>();
+        for (DyeColor color : DyeColor.values()) {
+            Item item = itemProvider.apply(color);
+            if (item == null) continue;
+            CataloguedResource resource = new CataloguedResource(name, new Item[]{item}, 
+                count -> taskFactory.apply(color, count));
+            registerResource(resource);
+            resources.add(resource);
+        }
+        return resources.toArray(new CataloguedResource[0]);
+    }
+
+    /**
+     * Registers a crop resource.
+     */
+    public static void crop(String name, Item item, Block block, Item seedItem) {
+        simple(name, new Item[]{item}, count -> new CropHarvestTask(item, count, block, seedItem));
+    }
+
+    /**
+     * Registers a shear resource.
+     */
+    public static CataloguedResource shear(String name, Block block, Item item) {
+        return simple(name, new Item[]{item}, count -> new ShearAndCollectBlockTask(item, count, block));
+    }
+
+    /**
+     * Creates an alias for a resource.
+     */
+    public static void alias(String aliasName, String originalName) {
+        CataloguedResource original = _nameToResourceTask.get(originalName);
+        if (original != null) {
+            _nameToResourceTask.put(aliasName, original);
+        }
+    }
+
+    // ========================================================================
+    // Internal Registration Methods
+    // ========================================================================
+
+    private static final String o = null;
+    private static final String p = "planks";
+    private static final String s = "stick";
+
+    private static void registerResource(CataloguedResource resource) {
+        _nameToResourceTask.put(resource.name, resource);
+        for (Item item : resource.items) {
+            _itemToResourceTask.put(item, resource);
+            _resourcesObtainable.add(item);
+        }
+    }
+
+    /**
+     * Returns all obtainable resources.
+     */
+    public static HashSet<Item> getResourcesObtainable() {
+        return _resourcesObtainable;
+    }
+
+    /**
+     * Returns all registered resource names.
+     */
+    public static HashSet<String> getAllResourceNames() {
+        return new HashSet<>(_nameToResourceTask.keySet());
+    }
 }
