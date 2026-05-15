@@ -1,7 +1,7 @@
 package adris.altoclef.mixins;
 
-import net.minecraft.network.ClientConnection;
 import org.spongepowered.asm.mixin.Mixin;
+import net.minecraft.network.ClientConnection;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientConnection.class)
 public class LoadChunkMixin {
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void onChunkData(CallbackInfo ci) {
-        // Handle chunk loading
+    private void onConnection(CallbackInfo ci) {
+        // Connection init
     }
 }
