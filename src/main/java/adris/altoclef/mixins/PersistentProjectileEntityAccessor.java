@@ -6,6 +6,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(PersistentProjectileEntity.class)
 public interface PersistentProjectileEntityAccessor {
-    @Accessor("inGround")
-    boolean isInGround();
+    @Accessor("shooter")
+    net.minecraft.entity.Entity getShooter();
+    
+    @Accessor("piercingLevel")
+    byte getPiercingLevel();
 }
