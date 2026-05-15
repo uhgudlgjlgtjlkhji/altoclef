@@ -8,13 +8,4 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AbstractFurnaceScreenHandlerAccessor {
     @Accessor("fuelTime")
     int getFuelTime();
-    
-    @Accessor("fuelTime")
-    void setFuelTime(int fuelTime);
-    
-    @Accessor("cookedTime")
-    int getCookedTime();
-    
-    @Accessor("cookedTime")
-    void setCookedTime(int cookedTime);
 }

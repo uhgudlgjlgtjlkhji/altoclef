@@ -8,8 +8,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Screen.class)
 public class ClientOpenScreenMixin {
-    @Inject(method = "openHandledScreen", at = @At("HEAD"))
-    private void onOpenScreen(net.minecraft.client.gui.screen.Screen screen, CallbackInfo ci) {
+    @Inject(method = "method_36742", at = @At("HEAD"))
+    private void onOpenScreen(net.minecraft.screen.ScreenHandler handler, CallbackInfo ci) {
         // Handle screen opening
     }
 }
