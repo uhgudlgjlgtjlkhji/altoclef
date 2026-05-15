@@ -12,10 +12,6 @@ group = project.maven_group
 
 repositories {
     mavenCentral()
-    maven {
-        name = 'gaucho-matrero-repo'
-        url = 'https://gaucho-matrero.github.io/maven/'
-    }
 }
 
 dependencies {
@@ -34,16 +30,6 @@ dependencies {
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
-
-    // Thank you georgeagostino for fixing my garbage
-    if (getProject().hasProperty("altoclef.development")) {
-        // Must run build from baritone-plus once
-        modImplementation 'baritone-api-fabric:baritone-unoptimized-fabric:1.18.2'
-    } else {
-        modImplementation "cabaletta:baritone-unoptimized-fabric:1.18.2"
-    }
-    //modImplementation 'baritone-api-fabric:baritone-api-fabric:1.6.3'
-    //implementation files('baritone-plus/build/libs/baritone-unoptimized-fabric-1.6.3.jar')
 }
 
 jar {
