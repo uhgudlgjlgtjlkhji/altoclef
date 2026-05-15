@@ -1,34 +1,19 @@
-package adris.altoclef.trackers;
+package adris.altoclef.tracker;
 
-import adris.altoclef.AltoClef;
+import net.minecraft.util.math.BlockPos;
 
-public abstract class Tracker {
+public abstract class Tracker<T> {
+    protected final String name;
+    protected boolean enabled = true;
 
-    protected AltoClef _mod;
-    // Needs to update
-    private boolean _dirty = true;
-
-    public Tracker(TrackerManager manager) {
-        manager.addTracker(this);
+    public Tracker(String name) {
+        this.name = name;
     }
 
-    public void setDirty() {
-        _dirty = true;
-    }
-
-    // Virtual
-    protected boolean isDirty() {
-        return _dirty;
-    }
-
-    protected void ensureUpdated() {
-        if (isDirty()) {
-            updateState();
-            _dirty = false;
-        }
-    }
-
-    protected abstract void updateState();
-
-    protected abstract void reset();
+    public abstract void tick();
+    public abstract void reset();
+    
+    public String getName() { return name; }
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
 }
