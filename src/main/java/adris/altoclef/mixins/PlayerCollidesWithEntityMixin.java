@@ -1,7 +1,7 @@
 package adris.altoclef.mixins;
 
-import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
+import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -10,6 +10,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class PlayerCollidesWithEntityMixin {
     @Inject(method = "collidesWith", at = @At("HEAD"), cancellable = true)
     private void onCollide(Entity other, CallbackInfoReturnable<Boolean> cir) {
-        // Handle entity collisions
+        // Entity collision
     }
 }
