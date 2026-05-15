@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "altoclef",
-  "version": "0.4.1a",
+  "version": "1.1.0",
   "name": "Alto Clef",
   "description": "Plays Block Game",
   "authors": [
@@ -22,5 +22,11 @@
   },
   "mixins": [
     "altoclef.mixins.json"
-  ]
+  ],
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": "~26.1.2",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
 }
