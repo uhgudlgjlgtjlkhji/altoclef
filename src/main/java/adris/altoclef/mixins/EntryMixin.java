@@ -1,26 +1,17 @@
 package adris.altoclef.mixins;
 
-import adris.altoclef.Debug;
-import adris.altoclef.eventbus.EventBus;
-import adris.altoclef.eventbus.events.TitleScreenEntryEvent;
-import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(TitleScreen.class)
+@Mixin(Screen.class)
 public class EntryMixin {
-
-    private static boolean _initialized = false;
-
-    @Inject(at = @At("HEAD"), method = "init()V")
-    private void init(CallbackInfo info) {
-        if (!_initialized) {
-            _initialized = true;
-            Debug.logMessage("Global Init");
-            EventBus.publish(new TitleScreenEntryEvent());
-        }
+    @Inject(method = "addDrawableChild", at = @At("HEAD"))
+    private void onAddElement(Element element, CallbackInfoReturnable<Boolean> cir) {
+        // Handle UI element additions
     }
 }
-
