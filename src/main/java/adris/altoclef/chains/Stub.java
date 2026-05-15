@@ -1,1 +1,1 @@
-// Stub - all chains removed
+// Stub - all old code removed
