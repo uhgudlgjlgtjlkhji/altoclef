@@ -1,1 +1,1 @@
-// Stub - all old code removed
+// Stub file
