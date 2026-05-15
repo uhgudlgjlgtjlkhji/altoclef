@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface EntityAccessor {
     @Accessor("type")
     org.apache.commons.lang3.ObjectType<?> getType();
-    
     @Accessor("uuid")
     java.util.UUID getUuid();
 }
