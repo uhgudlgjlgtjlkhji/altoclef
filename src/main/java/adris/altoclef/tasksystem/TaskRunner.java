@@ -3,73 +3,48 @@ package adris.altoclef.tasksystem;
 import adris.altoclef.AltoClef;
 import adris.altoclef.Debug;
 
-import java.util.ArrayList;
-
 public class TaskRunner {
+    private Task currentTask;
+    private final TaskChain chain;
 
-    private final ArrayList<TaskChain> _chains = new ArrayList<>();
-    private final AltoClef _mod;
-    private boolean _active;
-
-    private TaskChain _cachedCurrentTaskChain = null;
-
-    public TaskRunner(AltoClef mod) {
-        _mod = mod;
-        _active = false;
+    public TaskRunner(TaskChain chain) {
+        this.chain = chain;
     }
 
-    public void tick() {
-        if (!_active) return;
-        // Get highest priority chain and run
-        TaskChain maxChain = null;
-        float maxPriority = Float.NEGATIVE_INFINITY;
-        for (TaskChain chain : _chains) {
-            if (!chain.isActive()) continue;
-            float priority = chain.getPriority(_mod);
-            if (priority > maxPriority) {
-                maxPriority = priority;
-                maxChain = chain;
-            }
-        }
-        if (_cachedCurrentTaskChain != null && maxChain != _cachedCurrentTaskChain) {
-            _cachedCurrentTaskChain.onInterrupt(_mod, maxChain);
-        }
-        _cachedCurrentTaskChain = maxChain;
-        if (maxChain != null) {
-            maxChain.tick(_mod);
-        }
+    public Task getCurrentTask() {
+        return currentTask;
     }
 
-    public void addTaskChain(TaskChain chain) {
-        _chains.add(chain);
+    public void setTask(Task task) {
+        this.currentTask = task;
+        AltoClef.getInstance().getBotBehaviour().setCurrentTask(task.getName());
     }
 
-    public void enable() {
-        if (!_active) {
-            _mod.getBehaviour().push();
-            _mod.getBehaviour().setPauseOnLostFocus(false);
+    public Task.Result tick() {
+        if (currentTask == null) {
+            return Task.Result.CONTINUE;
         }
-        _active = true;
-    }
 
-    public void disable() {
-        if (_active) {
-            _mod.getBehaviour().pop();
+        Debug.log("Ticking task: " + currentTask.getName());
+        Task.Result result = currentTask.tick();
+
+        if (result == Task.Result.SUCCESS) {
+            currentTask.setCompleted();
+            chain.onTaskComplete(currentTask);
+            return Task.Result.SUCCESS;
+        } else if (result == Task.Result.FAILURE) {
+            currentTask.setFailed();
+            chain.onTaskFailed(currentTask);
+            return Task.Result.FAILURE;
         }
-        for (TaskChain chain : _chains) {
-            chain.stop(_mod);
+
+        return Task.Result.CONTINUE;
+    }
+
+    public void cancel() {
+        if (currentTask != null) {
+            currentTask.setFailed();
+            currentTask = null;
         }
-        _active = false;
-
-        Debug.logMessage("Stopped");
-    }
-
-    public TaskChain getCurrentTaskChain() {
-        return _cachedCurrentTaskChain;
-    }
-
-    // Kinda jank ngl
-    public AltoClef getMod() {
-        return _mod;
     }
 }
