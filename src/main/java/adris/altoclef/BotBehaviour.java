@@ -23,33 +23,24 @@ public class BotBehaviour {
         
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null) return;
-        
-        // Basic movement and task handling stub
-        if (client.currentScreen == null) {
-            tryExecuteTask();
-        }
-    }
-
-    private void tryExecuteTask() {
-        // Stub - will be expanded later
     }
 
     public void enable() {
         enabled = true;
         running = true;
-        sendChatMessage(Text.literal("[AltoClef] Bot enabled!"), Formatting.GREEN);
+        sendChatMessage("Bot enabled!", Formatting.GREEN);
     }
 
     public void disable() {
         enabled = false;
         running = false;
-        sendChatMessage(Text.literal("[AltoClef] Bot disabled!"), Formatting.RED);
+        sendChatMessage("Bot disabled!", Formatting.RED);
     }
 
-    public void sendChatMessage(Text message, Formatting formatting) {
+    public void sendChatMessage(String message, Formatting formatting) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
-            client.player.sendMessage(message.copy().styled(style -> style.withColor(formatting)));
+            client.player.sendMessage(Text.literal(message).styled(style -> style.withColor(formatting)));
         }
     }
 
