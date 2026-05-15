@@ -1,40 +1,11 @@
 package adris.altoclef;
 
-import adris.altoclef.commands.*;
-import adris.altoclef.commandsystem.CommandException;
+import com.mojang.brigadier.CommandDispatcher;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
-/**
- * Initializes altoclef's built in commands.
- */
 public class AltoClefCommands {
-
-    public AltoClefCommands() throws CommandException {
-        // List commands here
-        AltoClef.getCommandExecutor().registerNewCommand(
-                new HelpCommand(),
-                new GetCommand(),
-                new FollowCommand(),
-                new GiveCommand(),
-                new EquipCommand(),
-                new DepositCommand(),
-                new StashCommand(),
-                new GotoCommand(),
-                new IdleCommand(),
-                new CoordsCommand(),
-                new StatusCommand(),
-                new InventoryCommand(),
-                new LocateStructureCommand(),
-                new StopCommand(),
-                new TestCommand(),
-                new FoodCommand(),
-                new ReloadSettingsCommand(),
-                new GamerCommand(),
-                new PunkCommand(),
-                new SetGammaCommand(),
-                new ListCommand(),
-                new CustomCommand()
-                //new TestMoveInventoryCommand(),
-                //    new TestSwapInventoryCommand()
-        );
+    public void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
+        // Stub - commands have been removed for minimal build
     }
 }
