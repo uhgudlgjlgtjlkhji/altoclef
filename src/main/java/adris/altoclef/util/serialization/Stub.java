@@ -1,0 +1,1 @@
+// Stub - serialization removed
