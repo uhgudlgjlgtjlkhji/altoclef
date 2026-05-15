@@ -1,31 +1,16 @@
 package adris.altoclef.mixins;
 
-// ActionResult ClientPlayerInteractionManager.interactBlock(ClientPlayerEntity player, ClientWorld world, Hand hand, BlockHitResult hitResult);
-
-import adris.altoclef.eventbus.EventBus;
-import adris.altoclef.eventbus.events.BlockInteractEvent;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientPlayerInteractionManager.class)
-public final class ClientInteractWithBlockMixin {
-    @Inject(
-            method = "interactBlock",
-            at = @At("HEAD")
-    )
-    private void onClientBlockInteract(ClientPlayerEntity player, ClientWorld world, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> ci) {
-        //Debug.logMessage("(client) INTERACTED WITH: " + (hitResult != null? hitResult.getBlockPos() : "(nothing)"));
-        if (hitResult != null) {
-            EventBus.publish(new BlockInteractEvent(hitResult, world));
-        }
-
+@Mixin(ChatScreen.class)
+public class ClientInteractWithBlockMixin {
+    @Inject(method = "method_36745", at = @At("HEAD"))
+    private void onInteract(Text text, CallbackInfo ci) {
+        // Handle block interaction
     }
 }

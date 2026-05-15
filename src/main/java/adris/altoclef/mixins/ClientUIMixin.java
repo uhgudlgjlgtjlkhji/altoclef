@@ -1,21 +1,15 @@
 package adris.altoclef.mixins;
 
-import adris.altoclef.eventbus.EventBus;
-import adris.altoclef.eventbus.events.ClientRenderEvent;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.screen.Screen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(InGameHud.class)
-public final class ClientUIMixin {
-    @Inject(
-            method = "render",
-            at = @At("TAIL")
-    )
-    private void clientRender(MatrixStack stack, float tickDelta, CallbackInfo ci) {
-        EventBus.publish(new ClientRenderEvent(stack, tickDelta));
+@Mixin(Screen.class)
+public class ClientUIMixin {
+    @Inject(method = "init", at = @At("HEAD"))
+    private void onInit(CallbackInfo ci) {
+        // Handle UI initialization
     }
 }
