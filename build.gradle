@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.15'
+    id 'fabric-loom' version '1.15-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -40,10 +40,4 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
-}
-
-tasks.register('sourcesJar', Jar) {
-    dependsOn classes
-    from sourceSets.main.allSource
-    archiveClassifier.set('sources')
 }
