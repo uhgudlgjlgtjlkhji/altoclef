@@ -1,7 +1,6 @@
 package adris.altoclef.mixins;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.hit.EntityHitResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

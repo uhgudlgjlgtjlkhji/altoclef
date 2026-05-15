@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPlayerEntity.class)
 public class ClientBlockBreakMixin {
     @Inject(method = "tryBreakBlock", at = @At("HEAD"))
-    private void onBreakBlock(org.joml.Vector3i pos, CallbackInfo ci) {
+    private void onBreakBlock(net.minecraft.util.math.BlockPos pos, CallbackInfo ci) {
         // Handle block breaking
     }
 }

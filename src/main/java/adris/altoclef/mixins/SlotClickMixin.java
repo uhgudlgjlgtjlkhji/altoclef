@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ScreenHandler.class)
 public class SlotClickMixin {
     @Inject(method = "clickSlot", at = @At("HEAD"), cancellable = true)
-    private void onSlotClick(int slotIdx, int button, SlotActionType action, CallbackInfo ci) {
+    private void onSlotClick(int slotIdx, int button, int action, CallbackInfo ci) {
         // Handle slot clicks
     }
 }
