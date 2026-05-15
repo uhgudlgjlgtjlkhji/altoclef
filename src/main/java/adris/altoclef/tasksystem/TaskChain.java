@@ -1,50 +1,21 @@
 package adris.altoclef.tasksystem;
 
-import adris.altoclef.AltoClef;
-
-import java.util.ArrayList;
-import java.util.List;
+import adris.altoclef.tasksystem.Task;
 
 public abstract class TaskChain {
+    protected final TaskRunner runner;
+    protected int currentTaskIndex = 0;
 
-    private final List<Task> _cachedTaskChain = new ArrayList<>();
-
-    public TaskChain(TaskRunner runner) {
-        runner.addTaskChain(this);
+    public TaskChain() {
+        this.runner = new TaskRunner(this);
     }
 
-    public void tick(AltoClef mod) {
-        _cachedTaskChain.clear();
-        onTick(mod);
+    public TaskRunner getRunner() {
+        return runner;
     }
 
-    public void stop(AltoClef mod) {
-        _cachedTaskChain.clear();
-        onStop(mod);
-    }
-
-    protected abstract void onStop(AltoClef mod);
-
-    public abstract void onInterrupt(AltoClef mod, TaskChain other);
-
-    protected abstract void onTick(AltoClef mod);
-
-    public abstract float getPriority(AltoClef mod);
-
-    public abstract boolean isActive();
-
-    public abstract String getName();
-
-    public List<Task> getTasks() {
-        return _cachedTaskChain;
-    }
-
-    void addTaskToChain(Task task) {
-        _cachedTaskChain.add(task);
-    }
-
-    public String toString() {
-        return getName();
-    }
-
+    public abstract void registerTasks();
+    public abstract void onTaskComplete(Task task);
+    public abstract void onTaskFailed(Task task);
+    public abstract void run();
 }
