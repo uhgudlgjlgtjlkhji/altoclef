@@ -1,46 +1,45 @@
 package adris.altoclef.util.time;
 
-import adris.altoclef.AltoClef;
-import adris.altoclef.Debug;
-import adris.altoclef.mixins.ClientConnectionAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.ClientConnection;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.Connection;
 
-// Simple timer
-public class TimerGame extends BaseTimer {
+public class TimerGame {
+    private Connection _lastConnection;
+    private double _lastTime;
 
-    private ClientConnection _lastConnection;
-
-    public TimerGame(double intervalSeconds) {
-        super(intervalSeconds);
+    public TimerGame(double initialTime) {
+        reset();
     }
 
-    private static double getTime(ClientConnection connection) {
-        if (connection == null) return 0;
-        return (double) ((ClientConnectionAccessor) connection).getTicks() / 20.0;
+    public TimerGame() {
+        reset();
     }
 
-    @Override
-    protected double currentTime() {
-        if (!AltoClef.inGame()) {
-            Debug.logError("Running game timer while not in game.");
-            return 0;
+    public void reset() {
+        Minecraft client = Minecraft.getInstance();
+        if (client.getConnection() != null) {
+            _lastConnection = client.getConnection().getConnection();
         }
-        // If we change connections, our game time will also be reset. In that case, offset our time to reflect that change.
-        ClientConnection currentConnection = null;
-        if (MinecraftClient.getInstance().getNetworkHandler() != null) {
-            currentConnection = MinecraftClient.getInstance().getNetworkHandler().getConnection();
+        _lastTime = getTime(_lastConnection);
+    }
+
+    public boolean elapsed(double seconds) {
+        return getElapsedTime() >= seconds;
+    }
+
+    public double getElapsedTime() {
+        return getTime(getCurrentConnection()) - _lastTime;
+    }
+
+    private Connection getCurrentConnection() {
+        Minecraft client = Minecraft.getInstance();
+        if (client.getConnection() != null) {
+            return client.getConnection().getConnection();
         }
-        if (currentConnection != _lastConnection) {
-            if (_lastConnection != null) {
-                double prevTimeTotal = getTime(_lastConnection);
-                Debug.logInternal("(TimerGame: New connection detected, offsetting by " + prevTimeTotal + " seconds)");
-                setPrevTimeForce(getPrevTime() - prevTimeTotal);
-            }
-            _lastConnection = currentConnection;
-        }
-        // Use ticks for timing. 20TPS is normal, if we go slower that's fine.
-        // Adding a "mod" argument here would be hell across the board. Not happening.
-        return getTime(currentConnection);
+        return _lastConnection;
+    }
+
+    private static double getTime(Connection connection) {
+        return System.currentTimeMillis() / 1000.0;
     }
 }
