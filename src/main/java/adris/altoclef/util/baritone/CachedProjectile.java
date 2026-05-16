@@ -1,31 +1,20 @@
 package adris.altoclef.util.baritone;
 
-import adris.altoclef.util.time.TimerGame;
-import net.minecraft.util.math.Vec3d;
-
-import java.lang.reflect.Type;
+import net.minecraft.world.phys.Vec3;
 
 public class CachedProjectile {
-    public Vec3d velocity;
-    public Vec3d position;
-    public double gravity;
-    public Type projectileType;
+    public Vec3 velocity;
+    public Vec3 position;
+    public boolean hasGravity;
+    private Vec3 _cachedHit;
 
-    private final TimerGame _lastCache = new TimerGame(2);
-    private Vec3d _cachedHit;
-    private boolean _cacheHeld = false;
+    public CachedProjectile() {}
 
-    public Vec3d getCachedHit() {
+    public Vec3 getCachedHit() {
         return _cachedHit;
     }
 
-    public void setCacheHit(Vec3d cache) {
+    public void setCacheHit(Vec3 cache) {
         _cachedHit = cache;
-        _cacheHeld = true;
-        _lastCache.reset();
-    }
-
-    public boolean needsToRecache() {
-        return !_cacheHeld || _lastCache.elapsed();
     }
 }
